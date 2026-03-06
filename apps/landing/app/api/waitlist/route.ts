@@ -18,6 +18,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "server error" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Email ya registrado o error servidor" },
+      { status: 500 },
+    );
   }
 }
