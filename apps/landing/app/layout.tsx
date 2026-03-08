@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     siteName: "Miyo",
     images: [
       {
-        url: "https://miyo-bay.vercel.app/logo-miyo.svg",
+        url: "https://miyo-bay.vercel.app/apps/landing/logo-miyo.svg",
         width: 1200,
         height: 630,
         alt: "Miyo - Finanzas personales sin ruido",
