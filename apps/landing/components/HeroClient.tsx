@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import CountUp from "react-countup";
 
 export default function HeroClient({ count }: { count: number }) {
   return (
@@ -14,8 +15,8 @@ export default function HeroClient({ count }: { count: number }) {
         transition={{ duration: 0.8 }}
         className="w-[320px] md:w-[420px] lg:w-[520px] mb-12"
       />
-      <div className="absolute inset-0 -z-10 flex justify-center">
-        <div className="w-[600px] h-[700px] bg-teal-200/30 blur-2xl rounded-full"></div>
+      <div className="absolute inset-0 -z-10 flex justify-center items-center pointer-events-none">
+        <div className="w-[900px] h-[500px] bg-gradient-to-r from-teal-200/20 via-cyan-200/10 to-transparent blur-3xl rounded-full opacity-60"></div>
       </div>
 
       <div className="flex flex-col items-center gap-4 max-w-xl">
@@ -43,8 +44,11 @@ export default function HeroClient({ count }: { count: number }) {
           transition={{ delay: 0.7 }}
           className="text-gray-700 text-sm"
         >
-          Únete a las <span className="font-semibold">{count}</span> personas
-          que ya esperan MIYO
+          Únete a las{" "}
+          <span className="font-semibold text-gray-900">
+            <CountUp end={count} duration={6} />
+          </span>{" "}
+          personas que ya esperan MIYO
         </motion.p>
       </div>
 
