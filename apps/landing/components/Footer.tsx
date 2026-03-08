@@ -10,7 +10,7 @@ export default function Footer() {
           {/* Logo izquierda */}
           <div>
             <Image
-              src="/logo-miyo.svg"
+              src="/WhiteLogoMiyo.svg"
               alt="MIYO"
               width={120}
               height={120}

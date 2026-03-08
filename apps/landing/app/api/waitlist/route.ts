@@ -12,6 +12,7 @@ export async function POST(req: Request) {
     if (!email) {
       return NextResponse.json({ error: "Email requerido" }, { status: 400 });
     }
+    console.log(process.env.DATABASE_URL);
 
     await pool.query(`INSERT INTO waitlist (email) VALUES ($1)`, [email]);
 
