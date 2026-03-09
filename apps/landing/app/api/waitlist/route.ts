@@ -28,17 +28,31 @@ export async function POST(req: Request) {
       subject: "Bienvenido a la lista de espera de MIYO 💸",
 
       html: `
-        <h2>Hola 👋</h2>
+        <h2>Bienvenido a MIYO 💸</h2>
 
-        <p>Gracias por unirte a la lista de espera de <strong>MIYO</strong>.</p>
+<p>Hola 👋</p>
 
-        <p>Estamos construyendo una nueva forma de entender y mejorar tus finanzas.</p>
+<p>
+Gracias por unirte a la lista de espera de <strong>MIYO</strong>.
+</p>
 
-        <p>Te avisaremos cuando la app esté disponible.</p>
+<p>
+Estamos construyendo una nueva forma de entender tus finanzas:
+más clara, más tranquila y sin el ruido de las apps tradicionales.
+</p>
 
-        <br/>
+<p>
+Cuando MIYO esté listo, serás de los primeros en saberlo.
+</p>
 
-        <p>— Equipo MIYO</p>
+<p>
+Mientras tanto, seguimos trabajando para que tu dinero
+se sienta un poco más bajo control.
+</p>
+
+<br/>
+
+<p>— Equipo MIYO</p>
       `,
     });
 
