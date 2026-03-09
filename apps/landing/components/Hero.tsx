@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 import { getWaitlistCount } from "@/lib/waitlist";
 import HeroClient from "./HeroClient";
 
