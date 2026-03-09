@@ -18,6 +18,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email requerido" }, { status: 400 });
     }
 
+    // expresión regular para validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // si el email no cumple el formato
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: "Email inválido" }, { status: 400 });
+    }
+
     // guardamos el email en la base de datos // PRISMA
     await pool.query("INSERT INTO waitlist (email) VALUES ($1)", [email]);
 
