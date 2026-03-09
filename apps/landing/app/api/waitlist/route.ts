@@ -17,7 +17,6 @@ export async function POST(req: Request) {
     if (!email) {
       return NextResponse.json({ error: "Email requerido" }, { status: 400 });
     }
-
     // expresión regular para validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -26,6 +25,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email inválido" }, { status: 400 });
     }
 
+    // comprobar si el email ya existe
+    const existingUser = await pool.query(
+      "SELECT id FROM waitlist WHERE email = $1",
+      [email],
+    );
+
+    // si ya existe devolvemos conflicto
+    if (existingUser.rows.length > 0) {
+      return NextResponse.json(
+        {
+          error: "Este correo ya está registrado en la lista de espera",
+        },
+        { status: 409 },
+      );
+    }
     // guardamos el email en la base de datos // PRISMA
     await pool.query("INSERT INTO waitlist (email) VALUES ($1)", [email]);
 

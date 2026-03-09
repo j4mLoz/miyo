@@ -6,6 +6,9 @@ export default function Waitlist() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
+  // nuevo estado para mensajes del servidor
+  const [message, setMessage] = useState("");
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -19,9 +22,17 @@ export default function Waitlist() {
       body: JSON.stringify({ email }),
     });
 
-    if (res.ok) {
-      setSubmitted(true);
+    // leemos la respuesta del backend
+    const data = await res.json();
+
+    if (!res.ok) {
+      // mostramos mensaje de error del servidor
+      setMessage(data.error);
+      return;
     }
+
+    // registro correcto
+    setSubmitted(true);
   }
 
   return (
@@ -39,31 +50,32 @@ export default function Waitlist() {
         </p>
 
         {!submitted ? (
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-          >
-            <input
-              type="email"
-              placeholder="Tu correo electrónico"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="
+          <>
+            <form
+              onSubmit={handleSubmit}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <input
+                type="email"
+                placeholder="Tu correo electrónico"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="
                 w-full
                 px-4 py-3
                 rounded-lg
                 border
-                border-gray-300xw
+                border-gray-300
                 focus:outline-none
                 focus:ring-2
                 focus:ring-[--color-miyo-primary]
               "
-              required
-            />
+                required
+              />
 
-            <button
-              type="submit"
-              className="
+              <button
+                type="submit"
+                className="
 bg-[#2D7F7A]
 text-white
 px-6
@@ -75,10 +87,14 @@ hover:bg-[#256f6a]
 transition
 w-full sm:w-auto
 "
-            >
-              Avísame
-            </button>
-          </form>
+              >
+                Avísame
+              </button>
+            </form>
+
+            {/* mensaje de error */}
+            {message && <p className="text-red-500 mt-4 text-sm">{message}</p>}
+          </>
         ) : (
           <div className="mt-6 text-green-600 font-medium">
             🎉 Gracias. Te avisaremos cuando MIYO esté listo.
