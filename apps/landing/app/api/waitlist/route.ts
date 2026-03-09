@@ -9,14 +9,45 @@ const pool = new Pool({
 // cliente de Resend para enviar correos
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// almacenamiento temporal de solicitudes por IP
+const rateLimit = new Map<string, number[]>();
+
+// configuración del límite
+const MAX_REQUESTS = 5;
+const WINDOW_MS = 60 * 1000; // 1 minuto
+
 export async function POST(req: Request) {
   try {
+    // obtenemos IP del usuario
+    const ip = req.headers.get("x-forwarded-for") || "unknown";
+
+    const now = Date.now();
+
+    const requests = rateLimit.get(ip) || [];
+
+    // eliminar solicitudes fuera de la ventana de tiempo
+    const recentRequests = requests.filter(
+      (timestamp) => now - timestamp < WINDOW_MS,
+    );
+
+    if (recentRequests.length >= MAX_REQUESTS) {
+      return NextResponse.json(
+        { error: "Demasiadas solicitudes. Intenta nuevamente en un minuto." },
+        { status: 429 },
+      );
+    }
+
+    // registrar nueva solicitud
+    recentRequests.push(now);
+    rateLimit.set(ip, recentRequests);
+
     // obtenemos el email enviado desde el formulario
     const { email } = await req.json();
 
     if (!email) {
       return NextResponse.json({ error: "Email requerido" }, { status: 400 });
     }
+
     // expresión regular para validar formato de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -40,13 +71,13 @@ export async function POST(req: Request) {
         { status: 409 },
       );
     }
+
     // guardamos el email en la base de datos // PRISMA
     await pool.query("INSERT INTO waitlist (email) VALUES ($1)", [email]);
 
     await resend.emails.send({
       from: "MIYO <onboarding@resend.dev>",
       to: email,
-
       subject: "Bienvenido a la lista de espera de MIYO 💸",
 
       html: `
