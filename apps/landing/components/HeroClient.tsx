@@ -52,7 +52,7 @@ export default function HeroClient({ count }: { count: number }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-4xl md:text-5xl font-semibold text-gray-800"
+          className="text-5xl md:text-5xl font-bold tracking-tight text-gray-900"
         >
           Tus finanzas, sin ruido.
         </motion.h1>
@@ -61,7 +61,7 @@ export default function HeroClient({ count }: { count: number }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="text-gray-500 text-lg"
+          className="text-gray-600 text-lg leading-relaxed"
         >
           Una nueva forma de entender, organizar y mejorar tu dinero.
         </motion.p>
