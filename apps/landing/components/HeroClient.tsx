@@ -1,23 +1,46 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CountUp from "react-countup";
 
-export default function HeroClient({ count }: { count: number }) {
+export default function HeroClient() {
   // Estado para guardar posición del mouse
   const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  // 🔥 estado del contador
+  const [count, setCount] = useState(0);
 
   // Detecta movimiento del mouse
   function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
     const { clientX, clientY } = e;
 
-    // Convertimos la posición a valores pequeños
     const x = (clientX - window.innerWidth / 2) / 40;
     const y = (clientY - window.innerHeight / 2) / 40;
 
     setPosition({ x, y });
   }
+
+  // 🔥 fetch del contador
+  useEffect(() => {
+    async function loadCount() {
+      try {
+        const res = await fetch("/api/count", {
+          cache: "no-store",
+        });
+
+        const data = await res.json();
+
+        if (data?.count !== undefined) {
+          setCount(data.count);
+        }
+      } catch (error) {
+        console.error("Error cargando contador:", error);
+      }
+    }
+
+    loadCount();
+  }, []);
 
   return (
     <section
@@ -33,7 +56,6 @@ export default function HeroClient({ count }: { count: number }) {
       <motion.img
         src="/logo-miyo.svg"
         alt="Miyo logo"
-        // desplazamiento según mouse
         animate={{
           x: position.x,
           y: position.y,
