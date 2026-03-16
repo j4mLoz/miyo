@@ -26,12 +26,16 @@ export default function Waitlist() {
     const data = await res.json();
 
     if (!res.ok) {
-      // mostramos mensaje de error del servidor
       setMessage(data.error);
       return;
     }
 
-    // registro correcto
+    // 👇 AQUÍ está la clave
+    if (data.message) {
+      setMessage(data.message);
+      return;
+    }
+
     setSubmitted(true);
   }
 
