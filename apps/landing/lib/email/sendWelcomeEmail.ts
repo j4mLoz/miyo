@@ -8,7 +8,7 @@ export async function sendWelcomeEmail(email: string) {
 
   try {
     await resend.emails.send({
-      from: "MIYO <no-reply@financemiyo.com>", // temporal
+      from: "MIYO <hello@financemiyo.com>", // temporal
       to: email,
       subject,
       html,
