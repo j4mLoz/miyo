@@ -13,6 +13,11 @@ export async function POST(req: Request) {
     if (!email) {
       return NextResponse.json({ error: "Email requerido" }, { status: 400 });
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: "Email no válido" }, { status: 400 });
+    }
 
     try {
       await pool.query("INSERT INTO waitlist (email) VALUES ($1)", [email]);
