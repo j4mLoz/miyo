@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { cookies } from "next/headers";
 
 export async function POST(req: Request) {
   try {
@@ -16,7 +17,6 @@ export async function POST(req: Request) {
       where: { email },
     });
 
-    // ⚠️ mensaje genérico (no revelar si existe o no)
     if (!user || !user.password) {
       return NextResponse.json(
         { error: "Credenciales inválidas" },
@@ -33,8 +33,17 @@ export async function POST(req: Request) {
       );
     }
 
-    // 🔐 eliminar password del response
     const { password: _, ...safeUser } = user;
+
+    // 🍪 FIX AQUÍ
+    const cookieStore = await cookies();
+
+    cookieStore.set("session", user.id, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
 
     return NextResponse.json({
       success: true,
