@@ -18,9 +18,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email no válido" }, { status: 400 });
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: "Password mínimo 6 caracteres" },
+        { error: "Password mínimo 8 caracteres" },
         { status: 400 },
       );
     }

@@ -22,6 +22,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -30,7 +31,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const res = await fetch("/api/auth/login", {
+      const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,9 +46,18 @@ export default function LoginPage() {
         setLoading(false);
         return;
       }
+      // ✅ éxito
+      setSuccess(true);
+      setLoading(false);
+      // ✅ éxito
+      setSuccess(true);
+      setLoading(false);
 
       // 🚀 redirect al dashboard
-      router.push("/dashboard");
+      // ⏳ redirección suave
+      setTimeout(() => {
+        router.push("/login");
+      }, 3000);
     } catch (err) {
       setError("Error inesperado");
       setLoading(false);
@@ -61,50 +71,51 @@ export default function LoginPage() {
         <h1 className="text-3xl font-bold text-center text-[#2D7F7A] mb-8">
           MIYO
         </h1>
-
-        {/* FORM */}
-        <form onSubmit={handleLogin} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D7F7A]"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-
-          <div>
+        {success ? (
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-[#2D7F7A]">
+              🎉 ¡Cuenta creada!
+            </h2>
+            <p className="text-gray-500 mt-2">
+              Revisa tu correo (próximamente 😉)
+            </p>
+            <p className="text-sm mt-4">Redirigiendo...</p>
+          </div>
+        ) : (
+          <form onSubmit={handleLogin} className="space-y-4">
             <input
-              type="password"
-              placeholder="Password"
+              type="email"
+              placeholder="Email"
               className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D7F7A]"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
-            <p className="text-sm text-right text-gray-400 mt-1 cursor-pointer">
-              forgot?
-            </p>
-          </div>
+            <div>
+              <input
+                type="password"
+                placeholder="Password"
+                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D7F7A]"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+              <p className="text-sm text-right text-gray-400 mt-1 cursor-pointer">
+                forgot?
+              </p>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#2D7F7A] text-white py-3 rounded-lg font-medium hover:bg-[#256f6a] transition disabled:opacity-50"
-          >
-            {loading ? "Entrando..." : "Login"}
-          </button>
-          <p className="text-sm text-center mt-4">
-            ¿No tienes cuenta?{" "}
-            <span
-              onClick={() => router.push("/register")}
-              className="text-[#2D7F7A] cursor-pointer"
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#2D7F7A] text-white py-3 rounded-lg font-medium hover:bg-[#256f6a] transition"
             >
-              Regístrate
-            </span>
-          </p>
-        </form>
+              {loading ? "Creando..." : "Crear cuenta"}
+            </button>
+          </form>
+        )}
 
         {/* DIVIDER */}
         <div className="my-6 border-t" />
