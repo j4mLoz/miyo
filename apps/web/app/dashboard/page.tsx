@@ -2,46 +2,89 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import SummaryCards from "@/components/dashboard/SummaryCards";
 
-export default function Dashboard() {
-  const [user, setUser] = useState<any>(null);
-
+export default function DashboardPage() {
   const router = useRouter();
 
-  async function handleLogout() {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-    });
+  const [loading, setLoading] = useState(true);
 
-    router.push("/login");
-  }
+  const [summary, setSummary] = useState({
+    income: 0,
+    expense: 0,
+    balance: 0,
+  });
+
+  // 🧠 estado de filtro
+  const [month, setMonth] = useState(
+    String(new Date().getMonth() + 1).padStart(2, "0"),
+  );
+
+  const [year, setYear] = useState(String(new Date().getFullYear()));
 
   useEffect(() => {
-    async function getUser() {
-      const res = await fetch("/api/auth/me");
-      const data = await res.json();
-      setUser(data.user);
+    async function loadData() {
+      try {
+        // 🔐 validar sesión
+        const authRes = await fetch("/api/auth/me");
+
+        if (!authRes.ok) {
+          router.push("/login");
+          return;
+        }
+
+        // 🔥 traer resumen filtrado
+        const res = await fetch(
+          `/api/transactions?month=${month}&year=${year}`,
+        );
+
+        const data = await res.json();
+
+        setSummary(data.summary);
+      } catch (error) {
+        console.error("Error cargando dashboard:", error);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    getUser();
-  }, []);
+    loadData();
+  }, [month, year]);
 
-  if (!user) {
-    return <p className="p-6">Cargando...</p>;
+  if (loading) {
+    return <div className="p-6 text-gray-500">Cargando dashboard...</div>;
   }
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">Bienvenido a MIYO 🚀</h1>
+      {/* 🔥 FILTRO */}
+      <div className="flex gap-2 mt-2">
+        <select
+          value={month}
+          onChange={(e) => setMonth(e.target.value)}
+          className="p-2 border rounded-lg"
+        >
+          {Array.from({ length: 12 }, (_, i) => {
+            const m = String(i + 1).padStart(2, "0");
 
-      <p className="mt-2 text-gray-600">{user.email}</p>
+            return (
+              <option key={m} value={m}>
+                Mes {m}
+              </option>
+            );
+          })}
+        </select>
 
-      <button
-        onClick={handleLogout}
-        className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg"
-      >
-        Cerrar sesión
-      </button>
+        <input
+          type="number"
+          value={year}
+          onChange={(e) => setYear(e.target.value)}
+          className="p-2 border rounded-lg w-24"
+        />
+      </div>
+
+      {/* 🔥 RESUMEN */}
+      <SummaryCards summary={summary} />
     </div>
   );
 }

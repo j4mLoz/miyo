@@ -2,10 +2,25 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 export async function POST() {
-  const cookieStore = await cookies();
+  try {
+    const cookieStore = await cookies();
 
-  // 🧹 eliminamos sesión
-  cookieStore.delete("session");
+    // 🧠 eliminamos cookie de sesión correctamente
+    cookieStore.set("session", "", {
+      httpOnly: true,
+      expires: new Date(0), // 🔥 invalida la cookie
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("LOGOUT ERROR:", error);
+
+    return NextResponse.json(
+      { error: "Error al cerrar sesión" },
+      { status: 500 },
+    );
+  }
 }
