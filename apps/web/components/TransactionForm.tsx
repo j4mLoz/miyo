@@ -3,6 +3,29 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+// 🧠 categorías base (fuera del componente)
+const expenseCategories = [
+  "Comida",
+  "Transporte",
+  "Vivienda",
+  "Entretenimiento",
+  "Suscripciones",
+  "Salud",
+  "Compras",
+  "Educación",
+  "Viajes",
+  "Otros",
+];
+
+const incomeCategories = [
+  "Salario",
+  "Freelance",
+  "Inversiones",
+  "Negocio",
+  "Regalos",
+  "Otros",
+];
+
 export default function TransactionForm() {
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("expense");
@@ -10,6 +33,9 @@ export default function TransactionForm() {
   const [note, setNote] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // 🧠 categorías dinámicas según tipo
+  const categories = type === "income" ? incomeCategories : expenseCategories;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -56,10 +82,11 @@ export default function TransactionForm() {
         <span className="absolute left-3 top-3 text-gray-400">$</span>
         <input
           type="number"
+          inputMode="decimal"
           placeholder="0.00"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="w-full pl-8 pr-3 py-3 border rounded-lg"
+          className="w-full pl-8 pr-3 py-3 border rounded-lg no-spinner"
         />
       </div>
 
@@ -73,17 +100,19 @@ export default function TransactionForm() {
         <option value="income">💰 Ingreso</option>
       </select>
 
-      {/* 🏷️ CATEGORÍAS */}
+      {/* 🏷️ CATEGORÍAS DINÁMICAS */}
       <select
         value={category}
         onChange={(e) => setCategory(e.target.value)}
         className="w-full p-3 border rounded-lg"
       >
         <option value="">Selecciona categoría</option>
-        <option value="comida">🍔 Comida</option>
-        <option value="transporte">🚗 Transporte</option>
-        <option value="ocio">🎮 Ocio</option>
-        <option value="hogar">🏠 Hogar</option>
+
+        {categories.map((cat) => (
+          <option key={cat} value={cat}>
+            {cat}
+          </option>
+        ))}
       </select>
 
       {/* 📝 NOTA */}

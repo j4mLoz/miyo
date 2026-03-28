@@ -1,16 +1,22 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import TransactionForm from "@/components/TransactionForm";
 
 export default function NewTransactionPage() {
-  return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-gray-50">
-      <div className="max-w-md w-full bg-white p-6 rounded-xl shadow">
-        <h1 className="text-xl font-semibold mb-4 text-gray-800">
-          Nueva transacción
-        </h1>
+  const router = useRouter();
 
-        {/* ❌ sin props de función */}
-        <TransactionForm />
-      </div>
+  return (
+    <div className="p-6 max-w-md mx-auto">
+      {/* 🔙 BOTÓN ATRÁS */}
+      <button
+        onClick={() => router.back()}
+        className="mb-4 text-sm text-gray-500 hover:text-gray-800"
+      >
+        ← Volver
+      </button>
+
+      <TransactionForm />
     </div>
   );
 }
