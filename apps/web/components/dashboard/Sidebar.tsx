@@ -1,10 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
 export default function Sidebar() {
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(true);
 
   async function handleLogout() {
@@ -12,30 +13,91 @@ export default function Sidebar() {
     router.push("/login");
   }
 
+  // 🧠 helper activo
+  const isActive = (path: string) => pathname === path;
+
   return (
     <div
-      className={`h-screen bg-[#2D7F7A] text-white p-4 transition-all ${
+      className={`h-screen bg-[#2D7F7A] text-white p-4 transition-all flex flex-col justify-between ${
         open ? "w-64" : "w-16"
       }`}
     >
-      {/* 🔥 Toggle */}
-      <button onClick={() => setOpen(!open)} className="mb-6 text-sm">
-        {open ? "←" : "→"}
-      </button>
-
-      {/* 🔥 Menu */}
-      <div className="flex flex-col gap-4">
-        <button onClick={() => router.push("/dashboard")}>Dashboard</button>
-
-        <button onClick={() => router.push("/transactions/new")}>
-          Nueva transacción
+      {/* 🔝 TOP */}
+      <div>
+        {/* 🔥 Toggle */}
+        <button
+          onClick={() => setOpen(!open)}
+          className="mb-6 text-sm opacity-80 hover:opacity-100"
+        >
+          {open ? "←" : "→"}
         </button>
+
+        {/* 🧠 LOGO */}
+        {open && (
+          <h1 className="text-xl font-bold mb-6 tracking-tight">Miyo</h1>
+        )}
+
+        {/* 🔥 MENU */}
+        <div className="flex flex-col gap-2">
+          {/* MAIN */}
+          {open && <p className="text-xs text-white/60 mt-2 mb-1">MAIN</p>}
+
+          <button
+            onClick={() => router.push("/dashboard")}
+            className={`text-left px-3 py-2 rounded-lg transition ${
+              isActive("/dashboard")
+                ? "bg-white text-[#2D7F7A] font-medium"
+                : "hover:bg-white/10"
+            }`}
+          >
+            🏠 {open && "Dashboard"}
+          </button>
+
+          <button
+            onClick={() => router.push("/dashboard/movements")}
+            className={`text-left px-3 py-2 rounded-lg transition ${
+              isActive("/dashboard/movements")
+                ? "bg-white text-[#2D7F7A]"
+                : "hover:bg-white/10"
+            }`}
+          >
+            💸 {open && "Movimientos"}
+          </button>
+
+          <button
+            onClick={() => router.push("/dashboard/subscriptions")}
+            className={`text-left px-3 py-2 rounded-lg transition ${
+              isActive("/dashboard/subscriptions")
+                ? "bg-white text-[#2D7F7A]"
+                : "hover:bg-white/10"
+            }`}
+          >
+            🔁 {open && "Suscripciones"}
+          </button>
+
+          {/* SYSTEM */}
+          {open && <p className="text-xs text-white/60 mt-4 mb-1">SYSTEM</p>}
+
+          <button
+            onClick={() => router.push("/dashboard/settings")}
+            className={`text-left px-3 py-2 rounded-lg transition ${
+              isActive("components/dashboard/settings")
+                ? "bg-white text-[#2D7F7A]"
+                : "hover:bg-white/10"
+            }`}
+          >
+            ⚙️ {open && "Ajustes"}
+          </button>
+        </div>
       </div>
 
-      {/* 🔥 Logout abajo */}
-      <div className="absolute bottom-6">
-        <button onClick={handleLogout}>Logout</button>
-      </div>
+      {/* 🔻 LOGOUT */}
+      <button
+        onClick={handleLogout}
+        className="text-red-200 hover:text-red-400 text-sm text-left px-3 py-2"
+      >
+        🚪 {open && "Cerrar sesión"}
+      </button>
     </div>
   );
 }

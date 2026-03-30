@@ -1,5 +1,4 @@
 import Sidebar from "@/components/dashboard/Sidebar";
-import Topbar from "@/components/dashboard/Topbar";
 
 export default function DashboardLayout({
   children,
@@ -8,15 +7,11 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="flex">
-      {/* 🔥 Sidebar */}
+      {/* Sidebar fijo */}
       <Sidebar />
 
-      {/* 🔥 Contenido */}
-      <div className="flex-1 p-6 bg-gray-50 min-h-screen">
-        <Topbar />
-
-        {children}
-      </div>
+      {/* Contenido */}
+      <main className="flex-1 min-h-screen bg-[#F7F9F9] p-6">{children}</main>
     </div>
   );
 }

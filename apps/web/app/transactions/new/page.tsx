@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import TransactionForm from "@/components/TransactionForm";
+import TransactionForm from "@/components/transactions/TransactionForm";
 
 export default function NewTransactionPage() {
   const router = useRouter();

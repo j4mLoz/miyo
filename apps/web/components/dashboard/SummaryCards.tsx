@@ -6,7 +6,7 @@ export default function SummaryCards({ summary }: any) {
       <div className="bg-white p-4 rounded-xl shadow">
         <p className="text-sm text-gray-500">Ingresos</p>
         <p className="text-xl font-semibold text-green-600">
-          ${summary.income}
+          ${summary.income ?? 0}
         </p>
       </div>
 
