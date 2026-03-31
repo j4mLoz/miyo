@@ -10,10 +10,9 @@ export default function Sidebar() {
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
+    router.replace("/login"); // 🔥 mejor práctica
   }
 
-  // 🧠 helper activo
   const isActive = (path: string) => pathname === path;
 
   return (
@@ -37,9 +36,8 @@ export default function Sidebar() {
           <h1 className="text-xl font-bold mb-6 tracking-tight">Miyo</h1>
         )}
 
-        {/* 🔥 MENU */}
+        {/* 🔥 MAIN */}
         <div className="flex flex-col gap-2">
-          {/* MAIN */}
           {open && <p className="text-xs text-white/60 mt-2 mb-1">MAIN</p>}
 
           <button
@@ -74,30 +72,31 @@ export default function Sidebar() {
           >
             🔁 {open && "Suscripciones"}
           </button>
-
-          {/* SYSTEM */}
-          {open && <p className="text-xs text-white/60 mt-4 mb-1">SYSTEM</p>}
-
-          <button
-            onClick={() => router.push("/dashboard/settings")}
-            className={`text-left px-3 py-2 rounded-lg transition ${
-              isActive("components/dashboard/settings")
-                ? "bg-white text-[#2D7F7A]"
-                : "hover:bg-white/10"
-            }`}
-          >
-            ⚙️ {open && "Ajustes"}
-          </button>
         </div>
       </div>
 
-      {/* 🔻 LOGOUT */}
-      <button
-        onClick={handleLogout}
-        className="text-red-200 hover:text-red-400 text-sm text-left px-3 py-2"
-      >
-        🚪 {open && "Cerrar sesión"}
-      </button>
+      {/* 🔻 SYSTEM (ABAJO) */}
+      <div className="flex flex-col gap-2">
+        {open && <p className="text-xs text-white/60 mb-1">SYSTEM</p>}
+
+        <button
+          onClick={() => router.push("/dashboard/settings")}
+          className={`text-left px-3 py-2 rounded-lg transition ${
+            isActive("/dashboard/settings")
+              ? "bg-white text-[#2D7F7A]"
+              : "hover:bg-white/10"
+          }`}
+        >
+          ⚙️ {open && "Ajustes"}
+        </button>
+
+        <button
+          onClick={handleLogout}
+          className="text-red-200 hover:text-red-400 text-sm text-left px-3 py-2"
+        >
+          🚪 {open && "Cerrar sesión"}
+        </button>
+      </div>
     </div>
   );
 }

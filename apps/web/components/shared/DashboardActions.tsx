@@ -5,18 +5,6 @@ import { useRouter } from "next/navigation";
 export default function DashboardActions() {
   const router = useRouter();
 
-  async function handleLogout() {
-    try {
-      await fetch("/api/auth/logout", {
-        method: "POST",
-      });
-
-      router.push("/login");
-    } catch (error) {
-      console.error("Error al cerrar sesión", error);
-    }
-  }
-
   return (
     <div className="flex items-center justify-between mb-6">
       {/* 🧠 IZQUIERDA */}
@@ -32,13 +20,6 @@ export default function DashboardActions() {
           className="bg-[#2D7F7A] text-white px-4 py-2 rounded-lg text-sm"
         >
           + Nuevo
-        </button>
-
-        <button
-          onClick={handleLogout}
-          className="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm"
-        >
-          Salir
         </button>
       </div>
     </div>
