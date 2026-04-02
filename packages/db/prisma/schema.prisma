@@ -8,11 +8,13 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  password     String?
-  transactions Transaction[]
-  createdAt    DateTime      @default(now())
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String?
+  createdAt     DateTime       @default(now())
+  currency String @default("USD")
+  transactions  Transaction[]
+  subscriptions Subscription[]
 }
 
 model Transaction {
@@ -24,5 +26,19 @@ model Transaction {
   date      DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id        String    @id @default(cuid())
+  name      String
+  amount    Float
+  startDate DateTime
+  endDate   DateTime?
+  autoDebit Boolean   @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
   createdAt DateTime @default(now())
 }

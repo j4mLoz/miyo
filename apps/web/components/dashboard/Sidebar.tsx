@@ -80,9 +80,9 @@ export default function Sidebar() {
         {open && <p className="text-xs text-white/60 mb-1">SYSTEM</p>}
 
         <button
-          onClick={() => router.push("/dashboard/settings")}
+          onClick={() => router.push("/settings")}
           className={`text-left px-3 py-2 rounded-lg transition ${
-            isActive("/dashboard/settings")
+            isActive("/settings")
               ? "bg-white text-[#2D7F7A]"
               : "hover:bg-white/10"
           }`}

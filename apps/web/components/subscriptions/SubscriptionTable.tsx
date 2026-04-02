@@ -27,7 +27,41 @@ export default function SubscriptionTable({ subscriptions }: any) {
                 <td className="p-3">{sub.endDate}</td>
                 <td className="p-3 font-medium">${sub.amount}</td>
 
-                <td className="p-3 text-right space-x-2">✏️ 🗑️</td>
+                <td className="p-3 text-right space-x-2">
+                  <button
+                    onClick={async () => {
+                      const newName = prompt("Nuevo nombre", sub.name);
+                      const newAmount = prompt("Nuevo monto", sub.amount);
+
+                      if (!newName || !newAmount) return;
+
+                      await fetch("/api/subscriptions", {
+                        method: "PATCH",
+                        body: JSON.stringify({
+                          id: sub.id,
+                          name: newName,
+                          amount: newAmount,
+                        }),
+                      });
+
+                      location.reload();
+                    }}
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await fetch("/api/subscriptions", {
+                        method: "DELETE",
+                        body: JSON.stringify({ id: sub.id }),
+                      });
+
+                      location.reload(); // simple por ahora
+                    }}
+                  >
+                    🗑️
+                  </button>
+                </td>
               </tr>
             ))
           )}

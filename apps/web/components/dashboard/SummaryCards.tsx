@@ -1,4 +1,5 @@
 "use client";
+import { formatCurrency } from "@/lib/currency";
 
 export default function SummaryCards({ summary }: any) {
   return (
@@ -6,19 +7,21 @@ export default function SummaryCards({ summary }: any) {
       <div className="bg-white p-4 rounded-xl shadow">
         <p className="text-sm text-gray-500">Ingresos</p>
         <p className="text-xl font-semibold text-green-600">
-          ${summary.income ?? 0}
+          {formatCurrency(summary.income)}
         </p>
       </div>
 
       <div className="bg-white p-4 rounded-xl shadow">
         <p className="text-sm text-gray-500">Gastos</p>
-        <p className="text-xl font-semibold text-red-500">${summary.expense}</p>
+        <p className="text-xl font-semibold text-red-500">
+          {formatCurrency(summary.expense)}
+        </p>
       </div>
 
       <div className="bg-white p-4 rounded-xl shadow">
         <p className="text-sm text-gray-500">Balance</p>
         <p className="text-xl font-semibold text-gray-800">
-          ${summary.balance}
+          {formatCurrency(summary.balance)}
         </p>
       </div>
     </div>
