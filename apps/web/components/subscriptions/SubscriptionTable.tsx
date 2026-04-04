@@ -1,4 +1,12 @@
+"use client";
+
+import { useUser } from "@/context/UserContext";
+import { formatCurrency } from "@/lib/currency";
+
 export default function SubscriptionTable({ subscriptions }: any) {
+  const { user } = useUser();
+  const currency = user?.currency || "USD";
+
   return (
     <div className="bg-white rounded-xl shadow overflow-hidden">
       <table className="w-full text-sm">
@@ -21,14 +29,17 @@ export default function SubscriptionTable({ subscriptions }: any) {
             </tr>
           ) : (
             subscriptions.map((sub: any, i: number) => (
-              <tr key={i} className="border-t">
+              <tr key={i} className="border-t hover:bg-gray-50 transition">
                 <td className="p-3">{sub.name}</td>
                 <td className="p-3">{sub.startDate}</td>
                 <td className="p-3">{sub.endDate}</td>
-                <td className="p-3 font-medium">${sub.amount}</td>
+                <td className="p-3 font-medium">
+                  {formatCurrency(sub.amount, currency)}
+                </td>
 
                 <td className="p-3 text-right space-x-2">
                   <button
+                    className="hover:scale-110 transition"
                     onClick={async () => {
                       const newName = prompt("Nuevo nombre", sub.name);
                       const newAmount = prompt("Nuevo monto", sub.amount);
@@ -49,14 +60,16 @@ export default function SubscriptionTable({ subscriptions }: any) {
                   >
                     ✏️
                   </button>
+
                   <button
+                    className="hover:scale-110 transition"
                     onClick={async () => {
                       await fetch("/api/subscriptions", {
                         method: "DELETE",
                         body: JSON.stringify({ id: sub.id }),
                       });
 
-                      location.reload(); // simple por ahora
+                      location.reload();
                     }}
                   >
                     🗑️

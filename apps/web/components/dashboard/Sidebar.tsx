@@ -10,7 +10,7 @@ export default function Sidebar() {
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.replace("/login"); // 🔥 mejor práctica
+    router.replace("/login");
   }
 
   const isActive = (path: string) => pathname === path;
@@ -71,6 +71,18 @@ export default function Sidebar() {
             }`}
           >
             🔁 {open && "Suscripciones"}
+          </button>
+
+          {/* 🏦 NUEVO: SAVINGS */}
+          <button
+            onClick={() => router.push("/savings")}
+            className={`text-left px-3 py-2 rounded-lg transition ${
+              isActive("/savings")
+                ? "bg-white text-[#2D7F7A]"
+                : "hover:bg-white/10"
+            }`}
+          >
+            💰 {open && "Ahorros"}
           </button>
         </div>
       </div>

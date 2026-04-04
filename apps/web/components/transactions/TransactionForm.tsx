@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
-// 🧠 categorías base (fuera del componente)
 const expenseCategories = [
   "Comida",
   "Transporte",
@@ -27,6 +27,11 @@ const incomeCategories = [
 ];
 
 export default function TransactionForm() {
+  const { user } = useUser();
+  const currency = user?.currency || "USD";
+
+  const symbol = currency === "EUR" ? "€" : "$";
+
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("expense");
   const [category, setCategory] = useState("");
@@ -34,12 +39,10 @@ export default function TransactionForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // 🧠 categorías dinámicas según tipo
   const categories = type === "income" ? incomeCategories : expenseCategories;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-
     setLoading(true);
 
     try {
@@ -57,12 +60,10 @@ export default function TransactionForm() {
       });
 
       if (!res.ok) {
-        console.log("Error creando transacción");
         setLoading(false);
         return;
       }
 
-      // limpiar
       setAmount("");
       setCategory("");
       setNote("");
@@ -77,9 +78,8 @@ export default function TransactionForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* 💰 MONTO PRO */}
       <div className="relative">
-        <span className="absolute left-3 top-3 text-gray-400">$</span>
+        <span className="absolute left-3 top-3 text-gray-400">{symbol}</span>
         <input
           type="number"
           inputMode="decimal"
@@ -90,7 +90,6 @@ export default function TransactionForm() {
         />
       </div>
 
-      {/* 🔄 TIPO */}
       <select
         value={type}
         onChange={(e) => setType(e.target.value)}
@@ -100,7 +99,6 @@ export default function TransactionForm() {
         <option value="income">💰 Ingreso</option>
       </select>
 
-      {/* 🏷️ CATEGORÍAS DINÁMICAS */}
       <select
         value={category}
         onChange={(e) => setCategory(e.target.value)}
@@ -115,7 +113,6 @@ export default function TransactionForm() {
         ))}
       </select>
 
-      {/* 📝 NOTA */}
       <textarea
         placeholder="Añade una nota (opcional)"
         value={note}
@@ -123,7 +120,6 @@ export default function TransactionForm() {
         className="w-full p-3 border rounded-lg"
       />
 
-      {/* 🚀 BOTÓN */}
       <button
         type="submit"
         className="w-full bg-[#2D7F7A] text-white py-3 rounded-lg hover:bg-[#256f6a] transition"

@@ -15,6 +15,7 @@ model User {
   currency String @default("USD")
   transactions  Transaction[]
   subscriptions Subscription[]
+  savings Saving[]
 }
 
 model Transaction {
@@ -41,4 +42,27 @@ model Subscription {
   user   User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+model Saving {
+  id            String   @id @default(uuid())
+  name          String
+  currentAmount Float    @default(0)
+  goalAmount    Float?
+  userId        String
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id])
+  movements     SavingMovement[]
+}
+
+model SavingMovement {
+  id        String   @id @default(uuid())
+  savingId  String
+  type      String   // "deposit" | "withdraw"
+  amount    Float
+  note      String?
+  createdAt DateTime @default(now())
+
+  saving    Saving   @relation(fields: [savingId], references: [id])
 }

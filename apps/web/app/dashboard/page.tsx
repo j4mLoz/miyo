@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
+
 import SummaryCards from "@/components/dashboard/SummaryCards";
 import Topbar from "@/components/dashboard/Topbar";
 import DashboardActions from "@/components/shared/DashboardActions";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { user, loading: userLoading } = useUser();
 
   const [summary, setSummary] = useState({
     income: 0,
@@ -18,16 +21,13 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!userLoading && !user) {
+      router.replace("/login");
+    }
+  }, [user, userLoading]);
+
+  useEffect(() => {
     async function loadData() {
-      // 🔐 1. validar sesión
-      const authRes = await fetch("/api/auth/me");
-
-      if (!authRes.ok) {
-        router.replace("/login"); // 🔥 clave → replace, no push
-        return;
-      }
-
-      // 📊 2. cargar datos
       const res = await fetch("/api/transactions");
       const data = await res.json();
 
@@ -40,10 +40,12 @@ export default function DashboardPage() {
       setLoading(false);
     }
 
-    loadData();
-  }, []);
+    if (user) {
+      loadData();
+    }
+  }, [user]);
 
-  if (loading) {
+  if (loading || userLoading) {
     return <p className="p-6 text-gray-500">Cargando...</p>;
   }
 

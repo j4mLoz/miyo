@@ -1,47 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useUser } from "@/context/UserContext";
 
 export default function SettingsPage() {
-  // 🧠 estado actual
+  const { user, loading, refreshUser } = useUser();
+
   const [currency, setCurrency] = useState("USD");
-
-  // 🧠 estado inicial (para detectar cambios)
   const [initialCurrency, setInitialCurrency] = useState("USD");
-
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // 🧠 detectar cambios
   const hasChanges = currency !== initialCurrency;
 
-  // 🔥 cargar usuario real
+  // 🔥 sincronizar con usuario global
   useEffect(() => {
-    async function loadUser() {
-      try {
-        const res = await fetch("/api/auth/me");
-        const data = await res.json();
-
-        if (data.user) {
-          setCurrency(data.user.currency || "USD");
-          setInitialCurrency(data.user.currency || "USD");
-        }
-      } catch (err) {
-        console.error("Error cargando usuario", err);
-      }
-
-      setLoading(false);
+    if (user) {
+      setCurrency(user.currency || "USD");
+      setInitialCurrency(user.currency || "USD");
     }
+  }, [user]);
 
-    loadUser();
-  }, []);
-
-  // 🧠 SOLO cambia estado (NO guarda)
   function handleChange(value: string) {
     setCurrency(value);
   }
 
-  // 💾 guardar cambios manualmente
   async function handleSave() {
     setSaving(true);
 
@@ -56,8 +38,10 @@ export default function SettingsPage() {
 
       if (!res.ok) throw new Error("Error guardando");
 
-      // 🔥 actualizar estado base
       setInitialCurrency(currency);
+
+      // 🔥 clave → refrescar usuario global
+      await refreshUser();
     } catch (err) {
       console.error("Error guardando settings", err);
     }
@@ -65,7 +49,6 @@ export default function SettingsPage() {
     setSaving(false);
   }
 
-  // 🧠 loading UX
   if (loading) {
     return <div className="p-6 text-gray-500">Cargando ajustes...</div>;
   }
@@ -89,7 +72,6 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        {/* SELECT */}
         <select
           value={currency}
           onChange={(e) => handleChange(e.target.value)}
@@ -101,18 +83,18 @@ export default function SettingsPage() {
         </select>
       </div>
 
-      {/* 🔥 BOTÓN FLOTANTE (SaaS STYLE) */}
+      {/* 🔥 BOTÓN */}
       <div className="fixed bottom-6 right-6">
         <button
           onClick={handleSave}
           disabled={!hasChanges || saving}
           className={`px-6 py-3 rounded-xl shadow-lg transition 
-      ${
-        hasChanges
-          ? "bg-[#2D7F7A] text-white hover:bg-[#256f6a]"
-          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-      }
-    `}
+            ${
+              hasChanges
+                ? "bg-[#2D7F7A] text-white hover:bg-[#256f6a]"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }
+          `}
         >
           {saving ? "Guardando..." : "Guardar cambios"}
         </button>
