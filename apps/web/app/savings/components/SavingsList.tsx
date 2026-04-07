@@ -4,16 +4,23 @@ import { useState } from "react";
 import { useSavings } from "../hooks/useSavings";
 import { SavingsCard } from "./SavingsCard";
 import { CreateSavingModal } from "./CreateSavingModal";
+import { SavingDetailModal } from "./SavingDetailModal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { useToast } from "@/components/ui/useToast";
+import { Toast } from "@/components/ui/Toast";
 
 export function SavingsList() {
-  const { savings } = useSavings();
+  const { savings, deleteSaving } = useSavings();
+  const [confirmDelete, setConfirmDelete] = useState(null);
+  const { message, showToast } = useToast();
   const [open, setOpen] = useState(false);
+  const [selectedSaving, setSelectedSaving] = useState(null);
 
   return (
     <div className="space-y-4">
       <button
         onClick={() => setOpen(true)}
-        className="bg-[#2D7F7A] text-white px-4 py-2 rounded-xl shadow hover:bg-[#256f6a]"
+        className="bg-[#2D7F7A] text-white px-4 py-2 rounded-xl"
       >
         + Nuevo ahorro
       </button>
@@ -24,11 +31,38 @@ export function SavingsList() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {savings.map((saving) => (
-          <SavingsCard key={saving.id} saving={saving} />
+          <SavingsCard
+            key={saving.id}
+            saving={saving}
+            onClick={(s) => setSelectedSaving(s)}
+            onDelete={(id) => setConfirmDelete(id)}
+          />
         ))}
       </div>
 
+      {/* Confirmar eliminación */}
+      <ConfirmModal
+        open={!!confirmDelete}
+        title="¿Eliminar este ahorro?"
+        onCancel={() => setConfirmDelete(null)}
+        onConfirm={() => {
+          deleteSaving(confirmDelete);
+          showToast("Ahorro eliminado con éxito");
+          setConfirmDelete(null);
+        }}
+      />
+
+      {/* Toast */}
+      <Toast message={message} />
+
+      {/* Crear */}
       <CreateSavingModal open={open} onClose={() => setOpen(false)} />
+
+      {/* 🔥 Detalle */}
+      <SavingDetailModal
+        saving={selectedSaving}
+        onClose={() => setSelectedSaving(null)}
+      />
     </div>
   );
 }

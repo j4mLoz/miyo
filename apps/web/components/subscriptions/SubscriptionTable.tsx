@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/context/UserContext";
-import { formatCurrency } from "@/lib/currency";
+import { formatCurrency, formatCurrencyDisplay } from "@/lib/currency";
 
 export default function SubscriptionTable({ subscriptions }: any) {
   const { user } = useUser();
@@ -34,7 +34,7 @@ export default function SubscriptionTable({ subscriptions }: any) {
                 <td className="p-3">{sub.startDate}</td>
                 <td className="p-3">{sub.endDate}</td>
                 <td className="p-3 font-medium">
-                  {formatCurrency(sub.amount, currency)}
+                  {formatCurrencyDisplay(sub.amount, currency)}
                 </td>
 
                 <td className="p-3 text-right space-x-2">

@@ -1,6 +1,10 @@
 "use client";
 
-import { formatCurrency } from "@/lib/currency";
+import {
+  formatCurrencyDisplay,
+  formatCurrencyInput,
+  parseCurrency,
+} from "@/lib/currency";
 import { useUser } from "@/context/UserContext";
 
 export default function SummaryCards({ summary }: any) {
@@ -13,21 +17,21 @@ export default function SummaryCards({ summary }: any) {
       <div className="bg-white p-4 rounded-xl shadow">
         <p className="text-sm text-gray-500">Ingresos</p>
         <p className="text-xl font-semibold text-green-600">
-          {formatCurrency(summary.income, currency)}
+          {formatCurrencyDisplay(summary.income, currency)}
         </p>
       </div>
 
       <div className="bg-white p-4 rounded-xl shadow">
         <p className="text-sm text-gray-500">Gastos</p>
         <p className="text-xl font-semibold text-red-500">
-          {formatCurrency(summary.expense, currency)}
+          {formatCurrencyDisplay(summary.expense, currency)}
         </p>
       </div>
 
       <div className="bg-white p-4 rounded-xl shadow">
         <p className="text-sm text-gray-500">Balance</p>
         <p className="text-xl font-semibold text-gray-800">
-          {formatCurrency(summary.balance, currency)}
+          {formatCurrencyDisplay(summary.balance, currency)}
         </p>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSavings } from "../hooks/useSavings";
+import { formatCurrencyInput, parseCurrency } from "@/lib/currency";
 
 export function CreateSavingModal({ open, onClose }) {
   const { addSaving } = useSavings();
@@ -17,14 +18,18 @@ export function CreateSavingModal({ open, onClose }) {
 
     addSaving({
       name,
-      goalAmount: hasGoal ? Number(goal) : undefined,
+      goalAmount: goal ? parseCurrency(goal) : null,
     });
-
     setName("");
     setGoal("");
     setHasGoal(false);
 
     onClose();
+  };
+
+  const handleGoalChange = (e) => {
+    const formatted = formatCurrencyInput(e.target.value);
+    setGoal(formatted);
   };
 
   return (
@@ -50,10 +55,11 @@ export function CreateSavingModal({ open, onClose }) {
 
         {hasGoal && (
           <input
-            placeholder="Meta €"
-            className="w-full p-3 border rounded-xl"
             value={goal}
-            onChange={(e) => setGoal(e.target.value)}
+            onChange={handleGoalChange}
+            inputMode="numeric"
+            placeholder="Meta €"
+            className="w-full border p-3 rounded-xl"
           />
         )}
 

@@ -64,3 +64,45 @@ export async function POST(req: Request) {
     );
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const { id } = await req.json();
+
+    await prisma.saving.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("ERROR DELETE SAVING:", error);
+
+    return NextResponse.json(
+      { error: "Error eliminando ahorro" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const { id, name, goalAmount } = await req.json();
+
+    const updated = await prisma.saving.update({
+      where: { id },
+      data: {
+        name,
+        goalAmount: goalAmount ? Number(goalAmount) : null,
+      },
+    });
+
+    return NextResponse.json({ updated });
+  } catch (error) {
+    console.error("ERROR UPDATE SAVING:", error);
+
+    return NextResponse.json(
+      { error: "Error actualizando ahorro" },
+      { status: 500 },
+    );
+  }
+}

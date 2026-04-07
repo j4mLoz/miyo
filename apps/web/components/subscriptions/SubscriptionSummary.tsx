@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/context/UserContext";
-import { formatCurrency } from "@/lib/currency";
+import { formatCurrency, formatCurrencyDisplay } from "@/lib/currency";
 
 export default function SubscriptionSummary({
   subscriptions,
@@ -27,7 +27,7 @@ export default function SubscriptionSummary({
 
       {show && (
         <div className="bg-white px-4 py-2 rounded-lg shadow font-semibold">
-          {formatCurrency(total, currency)}
+          {formatCurrencyDisplay(total, currency)}
         </div>
       )}
     </div>
