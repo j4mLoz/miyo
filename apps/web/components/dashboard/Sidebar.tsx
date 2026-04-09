@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function Sidebar() {
   const router = useRouter();
@@ -32,9 +33,16 @@ export default function Sidebar() {
         </button>
 
         {/* 🧠 LOGO */}
-        {open && (
-          <h1 className="text-xl font-bold mb-6 tracking-tight">Miyo</h1>
-        )}
+        <div className="mb-6 flex items-center justify-center">
+          <Image
+            src="/WhiteLogoMiyo.svg" // 👉 cambia aquí si tu archivo tiene otro nombre
+            alt="Miyo Logo"
+            width={open ? 120 : 32}
+            height={32}
+            className="transition-all duration-300 object-contain"
+            priority
+          />
+        </div>
 
         {/* 🔥 MAIN */}
         <div className="flex flex-col gap-2">
@@ -73,7 +81,6 @@ export default function Sidebar() {
             🔁 {open && "Suscripciones"}
           </button>
 
-          {/* 🏦 NUEVO: SAVINGS */}
           <button
             onClick={() => router.push("/savings")}
             className={`text-left px-3 py-2 rounded-lg transition ${
@@ -87,7 +94,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* 🔻 SYSTEM (ABAJO) */}
+      {/* 🔻 SYSTEM */}
       <div className="flex flex-col gap-2">
         {open && <p className="text-xs text-white/60 mb-1">SYSTEM</p>}
 

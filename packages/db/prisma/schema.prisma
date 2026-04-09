@@ -19,15 +19,16 @@ model User {
 }
 
 model Transaction {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   amount    Float
-  type      String // "income" | "expense"
-  category  String
+  type      String
+  category  String?
   note      String?
-  date      DateTime @default(now())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
+  savingId  String?
+  date      DateTime @default(now())
+
+  saving    Saving?  @relation(fields: [savingId], references: [id])
 }
 
 model Subscription {

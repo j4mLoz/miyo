@@ -3,15 +3,26 @@
 import { useState } from "react";
 import { useSavings } from "../hooks/useSavings";
 import { formatCurrencyInput, parseCurrency } from "@/lib/currency";
+import { useKeyboard } from "@/components/ui/useKeyboard";
+import { useUser } from "@/context/UserContext";
 
 export function CreateSavingModal({ open, onClose }) {
   const { addSaving } = useSavings();
+  const { user } = useUser();
+  const currency = user?.currency || "EUR";
 
   const [name, setName] = useState("");
   const [hasGoal, setHasGoal] = useState(false);
   const [goal, setGoal] = useState("");
 
-  if (!open) return null;
+  // 🔥 HANDLERS PRIMERO
+  const currencySymbolMap = {
+    EUR: "€",
+    USD: "$",
+    COP: "$",
+  };
+
+  const symbol = currencySymbolMap[currency] || "€";
 
   const handleSubmit = () => {
     if (!name.trim()) return;
@@ -20,10 +31,10 @@ export function CreateSavingModal({ open, onClose }) {
       name,
       goalAmount: goal ? parseCurrency(goal) : null,
     });
+
     setName("");
     setGoal("");
     setHasGoal(false);
-
     onClose();
   };
 
@@ -32,16 +43,25 @@ export function CreateSavingModal({ open, onClose }) {
     setGoal(formatted);
   };
 
+  // 🔥 HOOK DESPUÉS DE HANDLERS
+  useKeyboard({
+    onEscape: onClose,
+    onEnter: handleSubmit,
+  });
+
+  // 🔥 RETURN CONDICIONAL DESPUÉS
+  if (!open) return null;
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center px-4">
       <div className="bg-white p-6 rounded-2xl w-full max-w-md space-y-4">
         <h2 className="text-lg font-semibold">Nuevo ahorro</h2>
 
         <input
-          placeholder="Nombre del ahorro"
-          className="w-full p-3 border rounded-xl"
+          className="w-full border p-2 rounded"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          placeholder="Nombre del ahorro"
         />
 
         <label className="flex items-center gap-2 text-sm">
@@ -58,7 +78,7 @@ export function CreateSavingModal({ open, onClose }) {
             value={goal}
             onChange={handleGoalChange}
             inputMode="numeric"
-            placeholder="Meta €"
+            placeholder={goal ? "" : `Meta (${symbol})`}
             className="w-full border p-3 rounded-xl"
           />
         )}

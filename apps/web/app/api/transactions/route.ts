@@ -30,7 +30,6 @@ export async function GET(req: Request) {
       };
     }
 
-    // 🔥 TUS TRANSACCIONES (igual)
     const transactions = await prisma.transaction.findMany({
       where: {
         userId,
@@ -41,7 +40,6 @@ export async function GET(req: Request) {
       },
     });
 
-    // 🔥 NUEVO: RESUMEN (PRO)
     const summaryRaw = await prisma.transaction.groupBy({
       by: ["type"],
       where: {
@@ -97,10 +95,56 @@ export async function POST(req: Request) {
 
     const userId = session.value;
 
-    const { amount, type, category, note } = await req.json();
+    const { amount, type, category, note, savingId } = await req.json();
 
-    if (!amount || !type || !category) {
+    if (!amount || !type) {
       return NextResponse.json({ error: "Datos incompletos" }, { status: 400 });
+    }
+
+    // 🔥 CASO: AHORRO
+    if (type === "saving") {
+      if (!savingId) {
+        return NextResponse.json(
+          { error: "Ahorro no seleccionado" },
+          { status: 400 },
+        );
+      }
+
+      // 🧠 transacción + update en una sola operación segura
+      const result = await prisma.$transaction(async (tx) => {
+        // crear transacción
+        const transaction = await tx.transaction.create({
+          data: {
+            amount: Number(amount),
+            type,
+            note,
+            userId,
+            savingId,
+          },
+        });
+
+        // actualizar ahorro
+        await tx.saving.update({
+          where: { id: savingId },
+          data: {
+            currentAmount: {
+              increment: Number(amount),
+            },
+          },
+        });
+
+        return transaction;
+      });
+
+      return NextResponse.json({ transaction: result });
+    }
+
+    // 🔥 CASO NORMAL (income / expense)
+    if (!category) {
+      return NextResponse.json(
+        { error: "Categoría requerida" },
+        { status: 400 },
+      );
     }
 
     const transaction = await prisma.transaction.create({

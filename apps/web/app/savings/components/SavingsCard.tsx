@@ -28,7 +28,7 @@ export function SavingsCard({ saving, onClick, onDelete }) {
 
       {saving.goalAmount && (
         <p className="text-sm text-gray-500 mt-1">
-          Meta: € {formatCurrencyDisplay(saving.currentAmount, "EUR")}
+          Meta: {formatCurrencyDisplay(saving.goalAmount, "EUR")}
         </p>
       )}
     </div>
