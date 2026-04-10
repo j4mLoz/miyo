@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/useToast";
 import { Toast } from "@/components/ui/Toast";
 
 export function SavingsList() {
-  const { savings, deleteSaving } = useSavings();
+  const { savings, deleteSaving, addSaving, updateSaving } = useSavings();
   const [confirmDelete, setConfirmDelete] = useState(null);
   const { message, showToast } = useToast();
   const [open, setOpen] = useState(false);
@@ -56,12 +56,17 @@ export function SavingsList() {
       <Toast message={message} />
 
       {/* Crear */}
-      <CreateSavingModal open={open} onClose={() => setOpen(false)} />
+      <CreateSavingModal
+        open={open}
+        onClose={() => setOpen(false)}
+        onCreate={addSaving}
+      />
 
       {/* 🔥 Detalle */}
       <SavingDetailModal
         saving={selectedSaving}
         onClose={() => setSelectedSaving(null)}
+        onUpdate={updateSaving}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import { Pencil } from "lucide-react";
 import { useSavings } from "../hooks/useSavings";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useToast } from "@/components/ui/useToast";
+import { SavingsProgress } from "./SavingsProgress";
 import { Toast } from "@/components/ui/Toast";
 import { useKeyboard } from "@/components/ui/useKeyboard";
 
@@ -14,7 +15,7 @@ import {
   parseCurrency,
 } from "@/lib/currency";
 
-export function SavingDetailModal({ saving, onClose }) {
+export function SavingDetailModal({ saving, onClose, onUpdate }) {
   const { updateSaving } = useSavings();
 
   const [confirmEdit, setConfirmEdit] = useState(false);
@@ -98,6 +99,12 @@ export function SavingDetailModal({ saving, onClose }) {
                 Meta: {formatCurrencyDisplay(saving.goalAmount, "EUR")}
               </p>
             )}
+            {saving.goalAmount && (
+              <SavingsProgress
+                current={saving.currentAmount}
+                goal={saving.goalAmount}
+              />
+            )}
           </>
         )}
 
@@ -106,7 +113,7 @@ export function SavingDetailModal({ saving, onClose }) {
           title="¿Guardar cambios?"
           onCancel={() => setConfirmEdit(false)}
           onConfirm={() => {
-            updateSaving({
+            onUpdate({
               id: saving.id,
               name,
               goalAmount: goal ? parseCurrency(goal) : null,

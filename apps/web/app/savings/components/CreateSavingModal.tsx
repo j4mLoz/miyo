@@ -4,9 +4,10 @@ import { useState } from "react";
 import { useSavings } from "../hooks/useSavings";
 import { formatCurrencyInput, parseCurrency } from "@/lib/currency";
 import { useKeyboard } from "@/components/ui/useKeyboard";
+
 import { useUser } from "@/context/UserContext";
 
-export function CreateSavingModal({ open, onClose }) {
+export function CreateSavingModal({ open, onClose, onCreate }) {
   const { addSaving } = useSavings();
   const { user } = useUser();
   const currency = user?.currency || "EUR";
@@ -27,7 +28,7 @@ export function CreateSavingModal({ open, onClose }) {
   const handleSubmit = () => {
     if (!name.trim()) return;
 
-    addSaving({
+    onCreate({
       name,
       goalAmount: goal ? parseCurrency(goal) : null,
     });

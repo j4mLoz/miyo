@@ -2,54 +2,103 @@
 
 import { useEffect, useState } from "react";
 
+// 🧠 TYPE (CLAVE)
+type Saving = {
+  id: string;
+  name: string;
+  goalAmount?: number | null;
+  currentAmount: number;
+  createdAt?: string;
+};
+
 export function useSavings() {
-  const [savings, setSavings] = useState([]);
+  const [savings, setSavings] = useState<Saving[]>([]);
   const [loading, setLoading] = useState(true);
 
   async function fetchSavings() {
-    const res = await fetch("/api/savings");
-    const data = await res.json();
+    try {
+      const res = await fetch("/api/savings", {
+        cache: "no-store",
+      });
 
-    setSavings(data.savings);
-    setLoading(false);
+      const data = await res.json();
+
+      setSavings(data.savings || []);
+    } catch (err) {
+      console.error("Error fetching savings:", err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
     fetchSavings();
   }, []);
 
-  async function addSaving(saving) {
-    const res = await fetch("/api/savings", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(saving),
-    });
+  // 🔥 ADD
+  async function addSaving(saving: {
+    name: string;
+    goalAmount?: number | null;
+  }) {
+    try {
+      const res = await fetch("/api/savings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(saving),
+      });
 
-    const data = await res.json();
-    setSavings((prev) => [data.saving, ...prev]);
+      const data = await res.json();
+
+      setSavings((prev) => [data.saving, ...prev]);
+    } catch (err) {
+      console.error("Error adding saving:", err);
+    }
   }
 
-  async function deleteSaving(id) {
-    await fetch("/api/savings", {
-      method: "DELETE",
-      body: JSON.stringify({ id }),
-    });
-
+  // 🔥 DELETE
+  async function deleteSaving(id: string) {
     setSavings((prev) => prev.filter((s) => s.id !== id));
+
+    try {
+      await fetch("/api/savings", {
+        method: "DELETE",
+        body: JSON.stringify({ id }),
+      });
+    } catch (err) {
+      console.error("Error deleting saving:", err);
+      fetchSavings(); // fallback
+    }
   }
 
-  async function updateSaving(updatedSaving) {
-    const res = await fetch("/api/savings", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedSaving),
-    });
-
-    const data = await res.json();
-
+  // 🔥 UPDATE
+  async function updateSaving(updatedSaving: {
+    id: string;
+    name?: string;
+    goalAmount?: number | null;
+  }) {
+    // update inmediato
     setSavings((prev) =>
-      prev.map((s) => (s.id === data.updated.id ? data.updated : s)),
+      prev.map((s) =>
+        s.id === updatedSaving.id ? { ...s, ...updatedSaving } : s,
+      ),
     );
+
+    try {
+      const res = await fetch("/api/savings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedSaving),
+      });
+
+      const data = await res.json();
+
+      setSavings((prev) =>
+        prev.map((s) => (s.id === data.updated.id ? data.updated : s)),
+      );
+    } catch (err) {
+      console.error("Error updating saving:", err);
+      fetchSavings(); // fallback
+    }
   }
 
   return {
@@ -58,5 +107,6 @@ export function useSavings() {
     addSaving,
     deleteSaving,
     updateSaving,
+    refetchSavings: fetchSavings,
   };
 }

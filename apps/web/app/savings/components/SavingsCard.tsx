@@ -2,6 +2,7 @@
 
 import { Trash2 } from "lucide-react";
 import { formatCurrencyDisplay } from "@/lib/currency";
+import { SavingsProgress } from "./SavingsProgress";
 
 export function SavingsCard({ saving, onClick, onDelete }) {
   return (
@@ -30,6 +31,13 @@ export function SavingsCard({ saving, onClick, onDelete }) {
         <p className="text-sm text-gray-500 mt-1">
           Meta: {formatCurrencyDisplay(saving.goalAmount, "EUR")}
         </p>
+      )}
+
+      {saving.goalAmount && (
+        <SavingsProgress
+          current={saving.currentAmount}
+          goal={saving.goalAmount}
+        />
       )}
     </div>
   );

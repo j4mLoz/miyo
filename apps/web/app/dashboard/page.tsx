@@ -20,33 +20,53 @@ export default function DashboardPage() {
 
   const [loading, setLoading] = useState(true);
 
+  // 🔐 redirect seguro
   useEffect(() => {
     if (!userLoading && !user) {
       router.replace("/login");
     }
-  }, [user, userLoading]);
+  }, [user, userLoading, router]);
 
+  // 🔥 fetch robusto
   useEffect(() => {
+    if (!user) return;
+
+    let isMounted = true;
+
     async function loadData() {
-      const res = await fetch("/api/transactions");
-      const data = await res.json();
+      try {
+        setLoading(true);
 
-      if (!data.summary) {
-        setSummary({ income: 0, expense: 0, balance: 0 });
-      } else {
-        setSummary(data.summary);
+        const res = await fetch("/api/transactions", {
+          cache: "no-store", // 🔥 clave para evitar datos viejos
+        });
+
+        const data = await res.json();
+
+        if (!isMounted) return;
+
+        setSummary(data.summary || { income: 0, expense: 0, balance: 0 });
+      } catch (err) {
+        console.error("Error cargando dashboard:", err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
-
-      setLoading(false);
     }
 
-    if (user) {
-      loadData();
-    }
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
-  if (loading || userLoading) {
-    return <p className="p-6 text-gray-500">Cargando...</p>;
+  // 🔥 UX mejorada
+  if (userLoading || loading) {
+    return (
+      <div className="p-6 text-gray-500 animate-pulse">
+        Cargando dashboard...
+      </div>
+    );
   }
 
   return (
