@@ -56,7 +56,7 @@ export async function GET(req: Request) {
     let income = 0;
     let expense = 0;
 
-    summaryRaw.forEach((item) => {
+    summaryRaw.forEach((item: any) => {
       if (item.type === "income") {
         income = item._sum.amount || 0;
       }
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
       }
 
       // 🧠 transacción + update en una sola operación segura
-      const result = await prisma.$transaction(async (tx) => {
+      const result = await prisma.$transaction(async (tx: any) => {
         // crear transacción
         const transaction = await tx.transaction.create({
           data: {
