@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String?
+  createdAt     DateTime       @default(now())
+  currency String @default("USD")
+  transactions  Transaction[]
+  subscriptions Subscription[]
+  savings Saving[]
+}
+
+model Transaction {
+  id        String   @id @default(uuid())
+  amount    Float
+  type      String
+  category  String?
+  note      String?
+  userId    String
+  date      DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id]) // ✅ FIX
+
+  savingId  String?
+  saving    Saving?  @relation(fields: [savingId], references: [id])
+}
+
+model Subscription {
+  id        String    @id @default(cuid())
+  name      String
+  amount    Float
+  startDate DateTime
+  endDate   DateTime?
+  autoDebit Boolean   @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Saving {
+  id            String   @id @default(uuid())
+  name          String
+  currentAmount Float    @default(0)
+  goalAmount    Float?
+  userId        String
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id])
+
+  transactions  Transaction[] // ✅ FIX (esto faltaba)
+  movements     SavingMovement[]
+}
+
+model SavingMovement {
+  id        String   @id @default(uuid())
+  savingId  String
+  type      String   // "deposit" | "withdraw"
+  amount    Float
+  note      String?
+  createdAt DateTime @default(now())
+
+  saving    Saving   @relation(fields: [savingId], references: [id])
+}
