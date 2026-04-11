@@ -2,7 +2,13 @@
 
 import { useEffect } from "react";
 
-export function useKeyboard({ onEscape, onEnter }) {
+// 🔥 TIPADO DEL HOOK
+interface UseKeyboardProps {
+  onEscape?: () => void;
+  onEnter?: () => void;
+}
+
+export function useKeyboard({ onEscape, onEnter }: UseKeyboardProps) {
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === "Escape") {

@@ -1,6 +1,19 @@
 "use client";
 
-export function ConfirmModal({ open, title, onConfirm, onCancel }) {
+// 🔥 TIPADO PRO
+interface ConfirmModalProps {
+  open: boolean;
+  title: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+export function ConfirmModal({
+  open,
+  title,
+  onConfirm,
+  onCancel,
+}: ConfirmModalProps) {
   if (!open) return null;
 
   return (

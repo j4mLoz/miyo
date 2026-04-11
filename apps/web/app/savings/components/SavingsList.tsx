@@ -9,12 +9,23 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useToast } from "@/components/ui/useToast";
 import { Toast } from "@/components/ui/Toast";
 
+// 🔥 MODELO TIPADO
+interface Saving {
+  id: string;
+  name: string;
+  currentAmount: number;
+  goalAmount?: number | null;
+}
+
 export function SavingsList() {
   const { savings, deleteSaving, addSaving, updateSaving } = useSavings();
-  const [confirmDelete, setConfirmDelete] = useState(null);
+
+  // 🔥 TIPOS CORRECTOS
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [selectedSaving, setSelectedSaving] = useState<Saving | null>(null);
+
   const { message, showToast } = useToast();
   const [open, setOpen] = useState(false);
-  const [selectedSaving, setSelectedSaving] = useState(null);
 
   return (
     <div className="space-y-4">
@@ -30,7 +41,7 @@ export function SavingsList() {
       )}
 
       <div className="grid gap-4 md:grid-cols-2">
-        {savings.map((saving) => (
+        {savings.map((saving: Saving) => (
           <SavingsCard
             key={saving.id}
             saving={saving}
@@ -46,6 +57,8 @@ export function SavingsList() {
         title="¿Eliminar este ahorro?"
         onCancel={() => setConfirmDelete(null)}
         onConfirm={() => {
+          if (!confirmDelete) return;
+
           deleteSaving(confirmDelete);
           showToast("Ahorro eliminado con éxito");
           setConfirmDelete(null);

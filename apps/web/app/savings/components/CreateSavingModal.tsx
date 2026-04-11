@@ -4,10 +4,20 @@ import { useState } from "react";
 import { useSavings } from "../hooks/useSavings";
 import { formatCurrencyInput, parseCurrency } from "@/lib/currency";
 import { useKeyboard } from "@/components/ui/useKeyboard";
-
 import { useUser } from "@/context/UserContext";
 
-export function CreateSavingModal({ open, onClose, onCreate }) {
+// 🔥 TIPADO PRO
+interface CreateSavingModalProps {
+  open: boolean;
+  onClose: () => void;
+  onCreate: (saving: any) => void;
+}
+
+export function CreateSavingModal({
+  open,
+  onClose,
+  onCreate,
+}: CreateSavingModalProps) {
   const { addSaving } = useSavings();
   const { user } = useUser();
   const currency = user?.currency || "EUR";
@@ -16,42 +26,35 @@ export function CreateSavingModal({ open, onClose, onCreate }) {
   const [hasGoal, setHasGoal] = useState(false);
   const [goal, setGoal] = useState("");
 
-  // 🔥 HANDLERS PRIMERO
-  const currencySymbolMap = {
-    EUR: "€",
-    USD: "$",
-    COP: "$",
-  };
-
-  const symbol = currencySymbolMap[currency] || "€";
-
   const handleSubmit = () => {
     if (!name.trim()) return;
 
-    onCreate({
+    const newSaving = {
       name,
       goalAmount: goal ? parseCurrency(goal) : null,
-    });
+    };
+
+    addSaving(newSaving);
+    onCreate?.(newSaving);
 
     setName("");
     setGoal("");
     setHasGoal(false);
+
     onClose();
   };
 
-  const handleGoalChange = (e) => {
-    const formatted = formatCurrencyInput(e.target.value);
-    setGoal(formatted);
-  };
-
-  // 🔥 HOOK DESPUÉS DE HANDLERS
   useKeyboard({
     onEscape: onClose,
     onEnter: handleSubmit,
   });
 
-  // 🔥 RETURN CONDICIONAL DESPUÉS
   if (!open) return null;
+
+  const handleGoalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCurrencyInput(e.target.value);
+    setGoal(formatted);
+  };
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center px-4">
@@ -59,10 +62,10 @@ export function CreateSavingModal({ open, onClose, onCreate }) {
         <h2 className="text-lg font-semibold">Nuevo ahorro</h2>
 
         <input
-          className="w-full border p-2 rounded"
+          placeholder="Nombre del ahorro"
+          className="w-full p-3 border rounded-xl"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Nombre del ahorro"
         />
 
         <label className="flex items-center gap-2 text-sm">
@@ -79,7 +82,7 @@ export function CreateSavingModal({ open, onClose, onCreate }) {
             value={goal}
             onChange={handleGoalChange}
             inputMode="numeric"
-            placeholder={goal ? "" : `Meta (${symbol})`}
+            placeholder={`Meta (${currency})`}
             className="w-full border p-3 rounded-xl"
           />
         )}

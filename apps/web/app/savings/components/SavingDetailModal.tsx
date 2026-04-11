@@ -5,7 +5,6 @@ import { Pencil } from "lucide-react";
 import { useSavings } from "../hooks/useSavings";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useToast } from "@/components/ui/useToast";
-import { SavingsProgress } from "./SavingsProgress";
 import { Toast } from "@/components/ui/Toast";
 import { useKeyboard } from "@/components/ui/useKeyboard";
 
@@ -15,7 +14,30 @@ import {
   parseCurrency,
 } from "@/lib/currency";
 
-export function SavingDetailModal({ saving, onClose, onUpdate }) {
+// 🔥 TIPADO DEL MODELO
+interface Saving {
+  id: string;
+  name: string;
+  currentAmount: number;
+  goalAmount?: number | null;
+}
+
+// 🔥 TIPADO DE PROPS
+interface SavingDetailModalProps {
+  saving: Saving | null;
+  onClose: () => void;
+  onUpdate: (saving: {
+    id: string;
+    name: string;
+    goalAmount: number | null;
+  }) => void;
+}
+
+export function SavingDetailModal({
+  saving,
+  onClose,
+  onUpdate,
+}: SavingDetailModalProps) {
   const { updateSaving } = useSavings();
 
   const [confirmEdit, setConfirmEdit] = useState(false);
@@ -25,7 +47,6 @@ export function SavingDetailModal({ saving, onClose, onUpdate }) {
   const [name, setName] = useState("");
   const [goal, setGoal] = useState("");
 
-  // 🔥 sincronizar datos cuando cambia saving
   useEffect(() => {
     if (saving) {
       setName(saving.name);
@@ -33,8 +54,7 @@ export function SavingDetailModal({ saving, onClose, onUpdate }) {
     }
   }, [saving]);
 
-  // 🔥 handlers primero
-  const handleGoalChange = (e) => {
+  const handleGoalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = formatCurrencyInput(e.target.value);
     setGoal(formatted);
   };
@@ -43,13 +63,11 @@ export function SavingDetailModal({ saving, onClose, onUpdate }) {
     setConfirmEdit(true);
   };
 
-  // 🔥 hook después
   useKeyboard({
     onEscape: onClose,
     onEnter: editing ? handleSave : undefined,
   });
 
-  // 🔥 return condicional después
   if (!saving) return null;
 
   return (
@@ -98,12 +116,6 @@ export function SavingDetailModal({ saving, onClose, onUpdate }) {
               <p className="text-gray-500">
                 Meta: {formatCurrencyDisplay(saving.goalAmount, "EUR")}
               </p>
-            )}
-            {saving.goalAmount && (
-              <SavingsProgress
-                current={saving.currentAmount}
-                goal={saving.goalAmount}
-              />
             )}
           </>
         )}

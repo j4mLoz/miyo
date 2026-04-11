@@ -1,6 +1,12 @@
 "use client";
 
-export function SavingsProgress({ current, goal }) {
+// 🔥 TIPADO DE PROPS
+interface SavingsProgressProps {
+  current: number;
+  goal: number;
+}
+
+export function SavingsProgress({ current, goal }: SavingsProgressProps) {
   if (!goal || goal <= 0) return null;
 
   const percentage = Math.min((current / goal) * 100, 100);

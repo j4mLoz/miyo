@@ -1,6 +1,11 @@
 "use client";
 
-export function Toast({ message }) {
+// 🔥 TIPADO PRO
+interface ToastProps {
+  message: string | null;
+}
+
+export function Toast({ message }: ToastProps) {
   if (!message) return null;
 
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { useUser } from "@/context/UserContext";
-import { formatCurrency, formatCurrencyDisplay } from "@/lib/currency";
+import { formatCurrencyDisplay } from "@/lib/currency";
 
 export default function SubscriptionTable({ subscriptions }: any) {
   const { user } = useUser();
