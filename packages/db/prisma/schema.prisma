@@ -25,9 +25,11 @@ model Transaction {
   category  String?
   note      String?
   userId    String
-  savingId  String?
   date      DateTime @default(now())
 
+  user      User     @relation(fields: [userId], references: [id]) // ✅ FIX
+
+  savingId  String?
   saving    Saving?  @relation(fields: [savingId], references: [id])
 }
 
@@ -54,6 +56,8 @@ model Saving {
   createdAt     DateTime @default(now())
 
   user          User     @relation(fields: [userId], references: [id])
+
+  transactions  Transaction[] // ✅ FIX (esto faltaba)
   movements     SavingMovement[]
 }
 
