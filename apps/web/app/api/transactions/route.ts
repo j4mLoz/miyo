@@ -16,8 +16,10 @@ export async function GET(req: Request) {
     const userId = session.value;
 
     const { searchParams } = new URL(req.url);
+
     const month = searchParams.get("month");
     const year = searchParams.get("year");
+    const type = searchParams.get("type"); // 🔥 NUEVO
 
     let dateFilter = {};
 
@@ -32,49 +34,35 @@ export async function GET(req: Request) {
       };
     }
 
+    // 🔥 WHERE DINÁMICO
+    const where: any = {
+      userId,
+      ...(month && year && { date: dateFilter }),
+      ...(type && { type }), // 🔥 clave
+    };
+
+    // 🔥 TRANSACTIONS FILTRADAS
     const transactions = await prisma.transaction.findMany({
-      where: {
-        userId,
-        ...(month && year && { date: dateFilter }),
-      },
+      where,
       orderBy: {
         date: "desc",
       },
     });
 
-    const summaryRaw = await prisma.transaction.groupBy({
-      by: ["type"],
-      where: {
-        userId,
-        ...(month && year && { date: dateFilter }),
-      },
+    // 🔥 TOTAL DEL TIPO (income o expense)
+    const totalResult = await prisma.transaction.aggregate({
+      where,
       _sum: {
         amount: true,
       },
     });
 
-    let income = 0;
-    let expense = 0;
+    const total = totalResult._sum.amount || 0;
 
-    summaryRaw.forEach((item: any) => {
-      if (item.type === "income") {
-        income = item._sum.amount || 0;
-      }
-
-      if (item.type === "expense") {
-        expense = item._sum.amount || 0;
-      }
-    });
-
-    const balance = income - expense;
-
+    // 🔥 RESPUESTA LIMPIA PARA FRONT
     return NextResponse.json({
       transactions,
-      summary: {
-        income,
-        expense,
-        balance,
-      },
+      total,
     });
   } catch (error) {
     console.error("ERROR GET TRANSACTIONS:", error);

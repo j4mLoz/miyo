@@ -2,46 +2,66 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/context/UserContext";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refreshUser } = useUser();
 
-  // 🧠 modo: login o register
   const [mode, setMode] = useState<"login" | "register">("login");
 
-  // 🧠 estados del form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // 🔴 errores reales
   const [error, setError] = useState("");
-
-  // 🟢 mensajes positivos (nuevo)
   const [message, setMessage] = useState("");
 
   const [loading, setLoading] = useState(false);
 
-  // 🔐 si ya está logueado → dashboard
-  useEffect(() => {
-    async function checkUser() {
-      const res = await fetch("/api/auth/me");
-      const data = await res.json();
+  // 🔥 NUEVO: control de verificación
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-      if (data.user) {
-        router.push("/dashboard");
+  useEffect(() => {
+    let isMounted = true;
+
+    async function checkUser() {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        const data = await res.json();
+
+        if (!isMounted) return;
+
+        if (data.user) {
+          await refreshUser(); // 🔥 sincroniza contexto
+          router.replace("/dashboard"); // 🔥 importante
+        } else {
+          setCheckingAuth(false); // 🔥 solo mostramos login si NO hay user
+        }
+      } catch (err) {
+        setCheckingAuth(false);
       }
     }
 
     checkUser();
-  }, []);
 
-  // 🚀 submit dinámico (login o register)
+    return () => {
+      isMounted = false;
+    };
+  }, [router]);
+
+  // 🔥 evitar render mientras valida sesión
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-400">
+        Verificando sesión...
+      </div>
+    );
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     setLoading(true);
-
-    // 🧹 limpiamos mensajes anteriores
     setError("");
     setMessage("");
 
@@ -59,26 +79,20 @@ export default function LoginPage() {
 
       const data = await res.json();
 
-      // 🔴 error real
       if (!res.ok) {
         setError(data.error);
         setLoading(false);
         return;
       }
 
-      // 🟢 registro exitoso
       if (mode === "register") {
         setMode("login");
-
-        // 👉 ahora usamos message (no error)
         setMessage("Cuenta creada, ahora inicia sesión 👌");
-
         setLoading(false);
         return;
       }
 
-      // 🚀 login correcto
-      router.push("/dashboard");
+      router.replace("/dashboard"); // 🔥 replace = clave
     } catch (err) {
       setError("Error inesperado");
       setLoading(false);
@@ -88,12 +102,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F7F9F9] px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 transition-all">
-        {/* 🧠 LOGO */}
         <h1 className="text-3xl font-bold text-center text-[#2D7F7A] mb-6 tracking-tight">
           Miyo
         </h1>
 
-        {/* 🔄 TOGGLE */}
         <div className="flex mb-6 bg-gray-100 rounded-xl p-1">
           <button
             onClick={() => setMode("login")}
@@ -116,7 +128,6 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* 🧠 TITULO */}
         <h2 className="text-lg font-semibold text-gray-800 mb-1 text-center">
           {mode === "login" ? "Bienvenido de nuevo 👋" : "Crea tu cuenta 🚀"}
         </h2>
@@ -127,49 +138,35 @@ export default function LoginPage() {
             : "Empieza a tomar control de tu dinero"}
         </p>
 
-        {/* 🧾 FORM */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* EMAIL */}
           <input
             type="email"
             placeholder="Email"
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D7F7A]"
+            className="w-full px-4 py-3 border rounded-lg"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
 
-          {/* PASSWORD */}
-          <div>
-            <input
-              type="password"
-              placeholder="Password"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2D7F7A]"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-3 border rounded-lg"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-            {mode === "login" && (
-              <p className="text-sm text-right text-gray-400 mt-1 cursor-pointer hover:text-gray-600 transition">
-                ¿Olvidaste tu contraseña?
-              </p>
-            )}
-          </div>
-
-          {/* 🔴 ERROR */}
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
-          {/* 🟢 MENSAJE POSITIVO */}
           {message && (
             <p className="text-[#2D7F7A] text-sm text-center font-medium">
               {message}
             </p>
           )}
 
-          {/* BOTÓN */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#2D7F7A] text-white py-3 rounded-lg font-medium hover:bg-[#256f6a] transition disabled:opacity-50"
+            className="w-full bg-[#2D7F7A] text-white py-3 rounded-lg"
           >
             {loading
               ? "Cargando..."

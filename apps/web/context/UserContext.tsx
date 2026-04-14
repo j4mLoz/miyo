@@ -22,15 +22,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   async function loadUser() {
     try {
-      const res = await fetch("/api/auth/me");
+      const res = await fetch("/api/auth/me", {
+        credentials: "include", // 🔥 CLAVE
+      });
+
       const data = await res.json();
 
       setUser(data.user || null);
     } catch (err) {
       console.error("Error loading user", err);
+      setUser(null);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -50,7 +54,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// 🔥 hook limpio
 export function useUser() {
   const context = useContext(UserContext);
 
