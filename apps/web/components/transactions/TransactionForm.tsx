@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { useToast } from "@/components/ui/useToast";
 
 const expenseCategories = [
   "Comida",
@@ -40,10 +41,10 @@ export default function TransactionForm() {
   const [loading, setLoading] = useState(false);
 
   const router = useRouter();
+  const { showToast } = useToast();
 
   const categories = type === "income" ? incomeCategories : expenseCategories;
 
-  // 🔥 cargar ahorros solo si se selecciona tipo "saving"
   useEffect(() => {
     if (type === "saving") {
       fetch("/api/savings")
@@ -79,19 +80,34 @@ export default function TransactionForm() {
         body: JSON.stringify(body),
       });
 
+      // ❌ ERROR CONTROLADO
       if (!res.ok) {
+        showToast("No se pudo guardar el movimiento ❌");
         setLoading(false);
         return;
       }
 
+      // ✅ MENSAJE INTELIGENTE
+      if (type === "income") {
+        showToast("Ingreso registrado con éxito 💰");
+      } else if (type === "expense") {
+        showToast("Gasto guardado correctamente 💸");
+      } else if (type === "saving") {
+        showToast("Ahorro añadido 🚀");
+      }
+
+      // 🧼 limpiar form
       setAmount("");
       setCategory("");
       setSavingId("");
       setNote("");
 
+      // 🚀 navegación + refresh
       router.push("/dashboard");
+      router.refresh();
     } catch (err) {
       console.error(err);
+      showToast("Error inesperado ⚠️");
     }
 
     setLoading(false);

@@ -19,7 +19,7 @@ export async function GET(req: Request) {
 
     const month = searchParams.get("month");
     const year = searchParams.get("year");
-    const type = searchParams.get("type"); // 🔥 NUEVO
+    const type = searchParams.get("type");
 
     let dateFilter = {};
 
@@ -34,35 +34,70 @@ export async function GET(req: Request) {
       };
     }
 
-    // 🔥 WHERE DINÁMICO
-    const where: any = {
+    const baseWhere: any = {
       userId,
       ...(month && year && { date: dateFilter }),
-      ...(type && { type }), // 🔥 clave
     };
 
-    // 🔥 TRANSACTIONS FILTRADAS
+    // 🔥 CASO 1: VIEW POR TIPO (transactions page)
+    if (type) {
+      const where = {
+        ...baseWhere,
+        type,
+      };
+
+      const transactions = await prisma.transaction.findMany({
+        where,
+        orderBy: { date: "desc" },
+      });
+
+      const totalResult = await prisma.transaction.aggregate({
+        where,
+        _sum: { amount: true },
+      });
+
+      return NextResponse.json({
+        transactions,
+        total: totalResult._sum.amount || 0,
+      });
+    }
+
+    // 🔥 CASO 2: DASHBOARD (SIN TYPE)
     const transactions = await prisma.transaction.findMany({
-      where,
-      orderBy: {
-        date: "desc",
-      },
+      where: baseWhere,
+      orderBy: { date: "desc" },
     });
 
-    // 🔥 TOTAL DEL TIPO (income o expense)
-    const totalResult = await prisma.transaction.aggregate({
-      where,
+    const summaryRaw = await prisma.transaction.groupBy({
+      by: ["type"],
+      where: baseWhere,
       _sum: {
         amount: true,
       },
     });
 
-    const total = totalResult._sum.amount || 0;
+    let income = 0;
+    let expense = 0;
 
-    // 🔥 RESPUESTA LIMPIA PARA FRONT
+    summaryRaw.forEach((item: any) => {
+      if (item.type === "income") {
+        income = item._sum.amount || 0;
+      }
+
+      if (item.type === "expense") {
+        expense = item._sum.amount || 0;
+      }
+    });
+
+    const balance = income - expense;
+
     return NextResponse.json({
       transactions,
-      total,
+      summary: {
+        income,
+        expense,
+        balance,
+      },
     });
   } catch (error) {
     console.error("ERROR GET TRANSACTIONS:", error);
